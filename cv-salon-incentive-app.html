@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CV Salon"/>
+<meta name="theme-color" content="#1a1108"/>
+<title>CV Salon — Incentive Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0f0c07;--surface:#1c1710;--surface2:#252015;--surface3:#2e2a1a;
+  --gold:#d4a843;--gold2:#f0c96a;--gold-dim:#7a5f25;
+  --text:#f5ecd7;--text2:#b8a882;--text3:#7a6e58;
+  --accent:#e8734a;--green:#5cb87a;--border:#3a3220;
+  --radius:16px;--radius-sm:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+
+/* SPLASH */
+#splash{background:var(--bg);align-items:center;justify-content:center;gap:20px;
+  background-image:radial-gradient(ellipse 60% 40% at 50% 20%,#2a200a 0%,transparent 70%)}
+.splash-logo{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:var(--gold2);letter-spacing:-1px}
+.splash-sub{font-size:13px;color:var(--text3);letter-spacing:3px;text-transform:uppercase}
+.splash-tagline{font-size:15px;color:var(--text2);margin-top:4px;text-align:center}
+.splash-btn{margin-top:32px;background:var(--gold);color:#0f0c07;font-family:'DM Sans',sans-serif;
+  font-size:16px;font-weight:600;border:none;border-radius:50px;padding:16px 48px;cursor:pointer}
+.splash-btn:active{transform:scale(.96)}
+
+/* LOGIN */
+#login{background:var(--bg);align-items:center;justify-content:center;padding:24px;overflow-y:auto;
+  background-image:radial-gradient(ellipse 80% 50% at 50% 0%,#2a200a 0%,transparent 60%)}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:32px 24px;width:100%;max-width:380px}
+.login-logo{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--gold2);text-align:center;margin-bottom:4px}
+.login-sub{text-align:center;font-size:12px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px}
+.tab-row{display:flex;background:var(--surface2);border-radius:50px;padding:4px;margin-bottom:24px;gap:4px}
+.tab-btn{flex:1;padding:10px;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s}
+.tab-btn.active{background:var(--gold);color:#0f0c07;font-weight:700}
+.field-label{font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;margin-top:16px}
+.field-sub{font-size:11px;color:var(--text3);margin-top:-4px;margin-bottom:8px;line-height:1.6}
+.inp{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 16px;color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--text3)}
+.btn-primary{width:100%;background:var(--gold);color:#0f0c07;border:none;border-radius:50px;
+  padding:16px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:20px}
+.btn-primary:active{transform:scale(.97)}
+.err-msg{background:#3d1a10;border:1px solid #7a3020;border-radius:8px;padding:10px 14px;
+  font-size:13px;color:#f08060;margin-top:12px;display:none;line-height:1.5}
+.info-banner{background:#0f2015;border:1px solid #1e4a30;border-radius:8px;padding:10px 14px;
+  font-size:12px;color:#7acf9a;margin-top:14px;line-height:1.6;text-align:center}
+
+/* HEADER */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100}
+.header-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--gold2)}
+.header-user{font-size:13px;color:var(--text2);text-align:right}
+.header-user strong{display:block;color:var(--text);font-size:14px}
+.logout-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text3);
+  font-size:12px;padding:6px 12px;border-radius:50px;cursor:pointer;margin-left:10px;font-family:'DM Sans',sans-serif}
+
+/* NAV */
+.nav-bar{background:var(--surface);border-top:1px solid var(--border);
+  display:flex;padding:8px 8px 16px;gap:2px;position:fixed;bottom:0;left:0;right:0;z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 2px;border-radius:12px;cursor:pointer;border:none;
+  background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .2s}
+.nav-item.active{background:var(--surface2);color:var(--gold)}
+.nav-icon{font-size:20px}
+.nav-label{font-size:9px;font-weight:500}
+
+/* PAGES */
+.page{display:none;flex:1;padding:20px 16px 100px;overflow-y:auto}
+.page.active{display:block}
+.section-title{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;margin-top:24px}
+
+/* MODE CARDS */
+.mode-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.mode-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;
+  padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s}
+.mode-card.active{border-color:var(--gold);background:var(--surface2)}
+.mode-card:active{transform:scale(.97)}
+.mode-icon{font-size:26px;margin-bottom:6px}
+.mode-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.mode-sub{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.4}
+
+/* CALC INPUTS */
+.calc-hero{background:linear-gradient(135deg,var(--surface),var(--surface2));
+  border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:16px}
+.calc-greeting{font-size:13px;color:var(--text3);margin-bottom:4px}
+.calc-name{font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px}
+.input-group{margin-bottom:14px}
+.input-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.input-label span{color:var(--text2);font-size:11px;letter-spacing:0;text-transform:none;margin-left:4px}
+.input-wrap{position:relative}
+.inp-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:15px;font-weight:600}
+.inp-big{width:100%;background:var(--surface3);border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 14px 14px 34px;color:var(--text);font-size:18px;font-weight:600;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.inp-big:focus{border-color:var(--gold)}
+.inp-big::placeholder{color:var(--text3);font-weight:300;font-size:15px}
+.calc-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#0f0c07;border:none;border-radius:14px;padding:16px;font-family:'DM Sans',sans-serif;
+  font-size:17px;font-weight:700;cursor:pointer;margin-top:4px;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.calc-btn:active{transform:scale(.97)}
+.eyebrow-hint{font-size:11px;color:var(--text3);background:var(--surface2);border-radius:8px;
+  padding:8px 12px;margin-bottom:6px;line-height:1.5;border-left:3px solid var(--gold-dim)}
+
+/* RESULTS */
+.results-section{display:none}
+.results-section.show{display:block}
+.base-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px}
+.base-item-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.base-item-val{font-size:16px;font-weight:700;color:var(--gold2)}
+.target-table{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.target-row{background:var(--surface);border:2px solid var(--border);border-radius:14px;
+  padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.target-row.selected{border-color:var(--gold);background:var(--surface2)}
+.target-badge{background:var(--surface3);border-radius:8px;padding:5px 8px;
+  font-size:12px;font-weight:700;color:var(--gold);min-width:38px;text-align:center}
+.target-row.selected .target-badge{background:var(--gold);color:#0f0c07}
+.target-info{flex:1}
+.target-amt{font-size:12px;color:var(--text3)}
+.target-earn{font-size:17px;font-weight:700;color:var(--text)}
+.eyebrow-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.eyebrow-val{font-size:22px;font-weight:700;color:var(--accent)}
+.total-card{background:linear-gradient(135deg,#2a1f08,#1c1508);
+  border:2px solid var(--gold-dim);border-radius:20px;padding:24px;text-align:center;margin-top:8px}
+.total-label{font-size:12px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.total-amount{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--gold2);line-height:1}
+.total-breakdown{font-size:12px;color:var(--text3);margin-top:8px}
+.save-btn{width:100%;background:var(--surface);border:1.5px solid var(--gold-dim);border-radius:14px;
+  padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:var(--gold);
+  cursor:pointer;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.save-btn:active{background:var(--surface2)}
+
+/* ACTUAL RESULT */
+.actual-result{background:linear-gradient(135deg,#0f2010,#081508);
+  border:2px solid #2a6a3a;border-radius:20px;padding:24px;text-align:center;margin-top:8px}
+.actual-label{font-size:12px;color:#5cb87a;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.actual-tier{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.actual-amount{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:#7ade9a;line-height:1}
+.actual-breakdown{font-size:13px;color:#5cb87a;margin-top:12px;line-height:2;white-space:pre-line}
+
+/* HISTORY */
+.history-empty{text-align:center;padding:48px 24px;color:var(--text3)}
+.month-group{margin-bottom:24px}
+.month-label{font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:10px;padding:6px 12px;background:var(--surface);border-radius:50px;display:inline-block}
+.history-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+.hist-right{text-align:right;flex-shrink:0}
+.hist-total{font-size:18px;font-weight:700;color:var(--gold2)}
+.hist-delete{background:none;border:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px;flex-shrink:0}
+
+/* ADMIN */
+.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+.stat-val{font-size:22px;font-weight:700;color:var(--gold2)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.lb-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.lb-rank{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--text3);min-width:32px;text-align:center}
+.lb-rank.gold{color:var(--gold2)}.lb-rank.silver{color:#a8b4c0}.lb-rank.bronze{color:#c08060}
+.lb-info{flex:1}
+.lb-name{font-size:14px;font-weight:600;color:var(--text)}
+.lb-meta{font-size:11px;color:var(--text3)}
+.lb-earn{font-size:17px;font-weight:700;color:var(--gold2);text-align:right}
+.lb-earn small{display:block;font-size:10px;color:var(--text3);font-weight:400}
+.admin-filter{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.filter-chip{background:var(--surface);border:1px solid var(--border);border-radius:50px;
+  padding:8px 14px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;
+  font-family:'DM Sans',sans-serif;transition:all .2s}
+.filter-chip.active{background:var(--gold);border-color:var(--gold);color:#0f0c07;font-weight:600}
+.bsp-entry{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:8px}
+.bsp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.bsp-name{font-size:14px;font-weight:600;color:var(--text)}
+.bsp-date{font-size:11px;color:var(--text3)}
+.bsp-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.metric{background:var(--surface2);border-radius:8px;padding:8px}
+.metric-label{font-size:10px;color:var(--text3);margin-bottom:2px}
+.metric-val{font-size:13px;font-weight:700;color:var(--text)}
+.metric-val.gold{color:var(--gold2)}
+.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600}
+.badge-gold{background:#2a1f08;color:var(--gold);border:1px solid var(--gold-dim)}
+.badge-green{background:#0f2a18;color:var(--green);border:1px solid #1e5530}
+.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
+.settings-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
+.settings-sub{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6}
+.current-pass-badge{display:inline-block;background:var(--surface3);border:1px solid var(--gold-dim);
+  border-radius:8px;padding:4px 12px;font-size:14px;font-weight:700;color:var(--gold2);
+  letter-spacing:1px;margin-bottom:12px}
+.btn-warning{width:100%;background:var(--surface2);border:1.5px solid var(--gold-dim);border-radius:12px;
+  padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--gold);
+  cursor:pointer;transition:all .2s}
+.btn-warning:active{background:var(--surface3)}
+
+/* PROFILE */
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center;margin-bottom:16px}
+.profile-avatar{width:68px;height:68px;border-radius:50%;background:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;
+  color:#0f0c07;margin:0 auto 14px;font-family:'Playfair Display',serif}
+.profile-name{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.profile-role{font-size:12px;color:var(--text3)}
+.profile-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.p-stat{background:var(--surface2);border-radius:12px;padding:12px 8px;text-align:center}
+.p-stat-val{font-size:18px;font-weight:700;color:var(--gold2)}
+.p-stat-label{font-size:10px;color:var(--text3);margin-top:4px}
+.info-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.info-key{font-size:13px;color:var(--text3)}
+.info-val{font-size:13px;font-weight:600;color:var(--text)}
+.danger-btn{width:100%;background:transparent;border:1.5px solid #5a2020;border-radius:12px;
+  padding:14px;font-family:'DM Sans',sans-serif;font-size:14px;color:#e06050;cursor:pointer;margin-top:8px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#2a2015;border:1px solid var(--gold-dim);border-radius:50px;
+  padding:12px 20px;font-size:13px;color:var(--gold2);opacity:0;transition:all .3s;
+  z-index:1000;pointer-events:none;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH ══ -->
+<div class="screen active" id="splash">
+  <div class="splash-logo">CV Salon</div>
+  <div class="splash-sub">Chinnie & Vinnie</div>
+  <div class="splash-tagline">Incentive Calculator<br/>इनसेंटिव कैलकुलेटर</div>
+  <button class="splash-btn" onclick="showScreen('login')">Get Started →</button>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div class="screen" id="login">
+  <div class="login-card">
+    <div class="login-logo">CV Salon</div>
+    <div class="login-sub">Login · लॉगिन</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('bsp')">💄 Beauty Provider</button>
+      <button class="tab-btn" onclick="switchTab('admin')">👑 Admin</button>
+    </div>
+
+    <!-- BSP LOGIN -->
+    <div id="bsp-form">
+      <div class="field-label">Your Name · आपका नाम</div>
+      <input class="inp" id="bsp-name" placeholder="e.g. Priya Sharma" autocomplete="name"/>
+      <div class="field-label">Branch · ब्रांच</div>
+      <select class="inp" id="bsp-branch">
+        <option value="">-- Select Branch --</option>
+        <option value="Vijay Nagar">Vijay Nagar (MR-4 Road)</option>
+        <option value="Wright Town">Wright Town (Home Science College Rd)</option>
+      </select>
+      <div class="field-label">Team Password · टीम पासवर्ड</div>
+      <div class="field-sub">Admin द्वारा WhatsApp पर शेयर किया गया पासवर्ड डालें<br/>(Password shared by Admin on WhatsApp)</div>
+      <input class="inp" id="bsp-pass" type="password" placeholder="Enter team password"/>
+      <div class="err-msg" id="bsp-err">❌ Wrong password. Please ask your Admin for the team password.</div>
+      <button class="btn-primary" onclick="bspLogin()">Login →</button>
+      <div class="info-banner">🔐 One password for the whole team<br/>Admin controls this — changes anytime</div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div id="admin-form" style="display:none">
+      <div class="field-label">Admin Password · एडमिन पासवर्ड</div>
+      <input class="inp" id="admin-pass" type="password" placeholder="Enter admin password"/>
+      <div class="err-msg" id="admin-err">❌ Wrong admin password. Try again.</div>
+      <button class="btn-primary" onclick="adminLogin()">Admin Login →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div class="screen" id="app">
+
+  <div class="app-header">
+    <div class="header-logo">CV Salon</div>
+    <div style="display:flex;align-items:center">
+      <div class="header-user">
+        <strong id="hdr-name">—</strong>
+        <span id="hdr-branch" style="font-size:11px">—</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- CALCULATOR PAGE -->
+  <div class="page active" id="page-calc">
+    <div class="calc-hero fade-up">
+      <div class="calc-greeting">Namaste 🙏 · नमस्ते</div>
+      <div class="calc-name" id="calc-welcome">Welcome!</div>
+
+      <div class="section-title" style="margin-top:8px">Choose Mode · मोड चुनें</div>
+      <div class="mode-selector">
+        <div class="mode-card active" id="mode-forecast" onclick="setMode('forecast')">
+          <div class="mode-icon">🎯</div>
+          <div class="mode-title">Forecast</div>
+          <div class="mode-sub">See projections for all targets (4x–10x)</div>
+        </div>
+        <div class="mode-card" id="mode-actual" onclick="setMode('actual')">
+          <div class="mode-icon">💰</div>
+          <div class="mode-title">My Incentive</div>
+          <div class="mode-sub">Enter actual sale → get exact earning</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHARED INPUTS -->
+    <div class="input-group">
+      <div class="input-label">Monthly Payout · मासिक पेआउट <span>(Based on working days)</span></div>
+      <div class="input-wrap">
+        <span class="inp-prefix">₹</span>
+        <input class="inp-big" id="inp-payout" type="number" inputmode="numeric" placeholder="e.g. 15000" oninput="liveCalc()"/>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">Eyebrow Services · आइब्रो सर्विस <span>(this month count)</span></div>
+      <div class="eyebrow-hint">⚡ Bonus only when MORE than 26 eyebrows done<br/>27 या उससे ज़्यादा करने पर ₹10 per eyebrow मिलेगा (पहले से गिनकर)</div>
+      <div class="input-wrap">
+        <span class="inp-prefix" style="font-size:13px">✂</span>
+        <input class="inp-big" id="inp-eyebrow" type="number" inputmode="numeric" placeholder="e.g. 50" oninput="liveCalc()"/>
+      </div>
+    </div>
+
+    <!-- ACTUAL MODE: SALE INPUT -->
+    <div id="actual-input" style="display:none">
+      <div class="input-group">
+        <div class="input-label">Actual Sale Done · असल सेल <span>(total ₹ this month)</span></div>
+        <div class="input-wrap">
+          <span class="inp-prefix">₹</span>
+          <input class="inp-big" id="inp-sale" type="number" inputmode="numeric" placeholder="e.g. 138500" oninput="liveCalc()"/>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">
+      <span>Calculate · देखें</span><span style="font-size:20px">→</span>
+    </button>
+
+    <!-- ═══ RESULTS ═══ -->
+    <div class="results-section" id="results">
+
+      <div class="section-title">📊 Base Calculation · बेस</div>
+      <div class="base-card fade-up">
+        <div><div class="base-item-label">Per Day</div><div class="base-item-val" id="res-perday">—</div></div>
+        <div><div class="base-item-label">Extra (4 days)</div><div class="base-item-val" id="res-extra">—</div></div>
+        <div><div class="base-item-label">Base · बेस</div><div class="base-item-val" style="color:var(--gold)" id="res-base">—</div></div>
+      </div>
+
+      <!-- FORECAST RESULTS -->
+      <div id="forecast-results">
+        <div class="section-title">🎯 Target Projections · टार्गेट</div>
+        <div class="target-table" id="target-table"></div>
+        <div class="section-title">✂️ Eyebrow Bonus · आइब्रो बोनस</div>
+        <div class="eyebrow-card fade-up">
+          <div>
+            <div style="font-size:12px;color:var(--text3)">₹10 per eyebrow — after 26 · 26 के बाद</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="eyebrow-count-label">—</div>
+          </div>
+          <div class="eyebrow-val" id="res-eyebrow">₹0</div>
+        </div>
+        <div class="section-title">💰 Total Earning · कुल कमाई</div>
+        <div class="total-card fade-up">
+          <div class="total-label">Projected Earning · अनुमानित कमाई</div>
+          <div class="total-amount" id="res-total">—</div>
+          <div class="total-breakdown" id="res-breakdown">Select a target above</div>
+          <button class="save-btn" onclick="saveEntry('forecast')">💾 Save Entry · सेव करें</button>
+        </div>
+      </div>
+
+      <!-- ACTUAL RESULTS -->
+      <div id="actual-results" style="display:none">
+        <div class="section-title">✂️ Eyebrow Bonus · आइब्रो बोनस</div>
+        <div class="eyebrow-card fade-up">
+          <div>
+            <div style="font-size:12px;color:var(--text3)">₹10 per eyebrow — after 26 · 26 के बाद</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="eyebrow-count-label2">—</div>
+          </div>
+          <div class="eyebrow-val" id="res-eyebrow2">₹0</div>
+        </div>
+        <div class="section-title">🎉 Your Extra Income · आपकी अतिरिक्त कमाई</div>
+        <div class="actual-result fade-up">
+          <div class="actual-label">Your Extra Income This Month</div>
+          <div class="actual-tier" id="actual-tier">—</div>
+          <div class="actual-amount" id="actual-total">₹0</div>
+          <div class="actual-breakdown" id="actual-breakdown">—</div>
+          <button class="save-btn" style="border-color:#2a6a3a;color:var(--green);margin-top:16px" onclick="saveEntry('actual')">
+            💾 Save Entry · सेव करें
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HISTORY PAGE -->
+  <div class="page" id="page-history">
+    <div class="section-title" style="margin-top:0">📅 My History · मेरी हिस्ट्री</div>
+    <div id="history-list"></div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="page-profile">
+    <div class="profile-card fade-up">
+      <div class="profile-avatar" id="prof-avatar">?</div>
+      <div class="profile-name" id="prof-name">—</div>
+      <div class="profile-role" id="prof-role">—</div>
+      <div class="profile-stat-row">
+        <div class="p-stat"><div class="p-stat-val" id="prof-entries">0</div><div class="p-stat-label">Entries</div></div>
+        <div class="p-stat"><div class="p-stat-val" id="prof-best">₹0</div><div class="p-stat-label">Best Month</div></div>
+        <div class="p-stat"><div class="p-stat-val" id="prof-eyebrows">0</div><div class="p-stat-label">Eyebrows</div></div>
+      </div>
+    </div>
+    <div class="info-row"><span class="info-key">Branch</span><span class="info-val" id="prof-branch">—</span></div>
+    <div class="info-row"><span class="info-key">Joined</span><span class="info-val" id="prof-joined">—</span></div>
+    <div class="divider"></div>
+    <button class="danger-btn" onclick="logout()">🚪 Logout · लॉगआउट</button>
+    <button class="danger-btn" style="border-color:#3a1010;color:#c04040;margin-top:8px" onclick="clearMyData()">🗑 Clear My Data</button>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div class="page" id="page-admin">
+    <div id="admin-content"></div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <button class="nav-item active" onclick="switchPage('calc',this)">
+      <span class="nav-icon">🧮</span><span class="nav-label">Calculate</span>
+    </button>
+    <button class="nav-item" onclick="switchPage('history',this)">
+      <span class="nav-icon">📅</span><span class="nav-label">History</span>
+    </button>
+    <button class="nav-item" id="admin-nav" style="display:none" onclick="switchPage('admin',this)">
+      <span class="nav-icon">👑</span><span class="nav-label">Admin</span>
+    </button>
+    <button class="nav-item" onclick="switchPage('profile',this)">
+      <span class="nav-icon">👤</span><span class="nav-label">Profile</span>
+    </button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// PASSWORD KEYS & DEFAULTS
+// ════════════════════════════════
+const ADMIN_KEY     = 'cv_admin_pass';
+const TEAM_KEY      = 'cv_team_pass';
+const DEFAULT_ADMIN = 'cvsalon@admin2024';
+const DEFAULT_TEAM  = 'cvsalon2024';
+
+function getAdminPass(){ return localStorage.getItem(ADMIN_KEY) || DEFAULT_ADMIN }
+function getTeamPass(){  return localStorage.getItem(TEAM_KEY)  || DEFAULT_TEAM  }
+function setTeamPass(p){ localStorage.setItem(TEAM_KEY, p) }
+function setAdminPass(p){ localStorage.setItem(ADMIN_KEY, p) }
+
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let currentUser = null;
+let isAdmin = false;
+let calcMode = 'forecast';
+let selectedMultiple = null;
+let calcData = null;
+
+// ════════════════════════════════
+// STORAGE
+// ════════════════════════════════
+function getUsers(){ return JSON.parse(localStorage.getItem('cv_users')||'{}') }
+function saveUsers(u){ localStorage.setItem('cv_users', JSON.stringify(u)) }
+function getAllEntries(){ return JSON.parse(localStorage.getItem('cv_entries')||'[]') }
+function saveAllEntries(e){ localStorage.setItem('cv_entries', JSON.stringify(e)) }
+function getUserEntries(name){ return getAllEntries().filter(e=>e.user===name) }
+
+// ════════════════════════════════
+// SCREENS
+// ════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ════════════════════════════════
+// LOGIN TABS
+// ════════════════════════════════
+let loginTab = 'bsp';
+function switchTab(t){
+  loginTab = t;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===(t==='bsp'?0:1)));
+  document.getElementById('bsp-form').style.display   = t==='bsp'   ? 'block':'none';
+  document.getElementById('admin-form').style.display = t==='admin' ? 'block':'none';
+}
+
+// ════════════════════════════════
+// BSP LOGIN — master team password
+// ════════════════════════════════
+function bspLogin(){
+  const name   = document.getElementById('bsp-name').value.trim();
+  const branch = document.getElementById('bsp-branch').value;
+  const pass   = document.getElementById('bsp-pass').value;
+  const err    = document.getElementById('bsp-err');
+
+  if(!name){ err.style.display='block'; err.textContent='Please enter your name.'; return; }
+  if(!branch){ err.style.display='block'; err.textContent='Please select your branch.'; return; }
+  if(!pass){ err.style.display='block'; err.textContent='Please enter the team password.'; return; }
+
+  if(pass !== getTeamPass()){
+    err.style.display='block';
+    err.textContent='❌ Wrong password. Ask your Admin for the current team password.';
+    return;
+  }
+  err.style.display='none';
+
+  const users = getUsers();
+  if(!users[name]){
+    users[name] = { name, branch, joined: new Date().toLocaleDateString('en-IN') };
+  } else {
+    users[name].branch = branch; // update branch if changed
+  }
+  saveUsers(users);
+  currentUser = users[name];
+  isAdmin = false;
+  enterApp();
+}
+
+// ════════════════════════════════
+// ADMIN LOGIN
+// ════════════════════════════════
+function adminLogin(){
+  const pass = document.getElementById('admin-pass').value;
+  const err  = document.getElementById('admin-err');
+  if(pass !== getAdminPass()){ err.style.display='block'; return; }
+  err.style.display='none';
+  currentUser = { name:'Admin', branch:'Both Branches', joined:'—' };
+  isAdmin = true;
+  enterApp();
+}
+
+// ════════════════════════════════
+// ENTER APP
+// ════════════════════════════════
+function enterApp(){
+  document.getElementById('hdr-name').textContent    = currentUser.name;
+  document.getElementById('hdr-branch').textContent  = currentUser.branch;
+  document.getElementById('calc-welcome').textContent = isAdmin
+    ? 'Welcome, Admin 👑'
+    : 'Hello, ' + currentUser.name.split(' ')[0] + '! 👋';
+  document.getElementById('prof-avatar').textContent  = currentUser.name[0].toUpperCase();
+  document.getElementById('prof-name').textContent    = currentUser.name;
+  document.getElementById('prof-role').textContent    = isAdmin
+    ? '👑 Owner / Admin'
+    : '💄 Beauty Service Provider · ' + currentUser.branch;
+  document.getElementById('prof-branch').textContent  = currentUser.branch;
+  document.getElementById('prof-joined').textContent  = currentUser.joined || '—';
+  document.getElementById('admin-nav').style.display  = isAdmin ? 'flex' : 'none';
+  updateProfileStats();
+  showScreen('app');
+  switchPage('calc', document.querySelector('.nav-item'));
+}
+
+function logout(){
+  currentUser=null; isAdmin=false; selectedMultiple=null; calcData=null; calcMode='forecast';
+  ['inp-payout','inp-eyebrow','inp-sale','admin-pass','bsp-pass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('admin-nav').style.display='none';
+  switchTab('bsp'); setMode('forecast'); showScreen('login');
+}
+
+// ════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════
+function switchPage(page, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(page==='history') renderHistory();
+  if(page==='admin')   renderAdmin();
+  if(page==='profile') updateProfileStats();
+}
+
+// ════════════════════════════════
+// CALC MODE SWITCH
+// ════════════════════════════════
+function setMode(mode){
+  calcMode = mode;
+  document.getElementById('mode-forecast').classList.toggle('active', mode==='forecast');
+  document.getElementById('mode-actual').classList.toggle('active',   mode==='actual');
+  document.getElementById('actual-input').style.display = mode==='actual' ? 'block' : 'none';
+  document.getElementById('results').classList.remove('show');
+  selectedMultiple=null; calcData=null;
+}
+
+// ════════════════════════════════
+// CORE LOGIC
+// ════════════════════════════════
+function calcEyebrowBonus(count){
+  // Bonus ONLY if count > 26 (i.e., 27+), counted from eyebrow #1
+  return count > 26 ? count * 10 : 0;
+}
+
+function computeBase(payout){
+  const perDay = payout / 30;
+  const extra  = perDay * 4;
+  const base   = payout + extra;
+  return { perDay, extra, base };
+}
+
+function fmt(n){ return '₹' + Math.round(n).toLocaleString('en-IN') }
+
+// ════════════════════════════════
+// LIVE CALC
+// ════════════════════════════════
+function liveCalc(){
+  const payout = parseFloat(document.getElementById('inp-payout').value);
+  if(payout >= 1000) calculate(true);
+}
+
+// ════════════════════════════════
+// CALCULATE
+// ════════════════════════════════
+function calculate(silent){
+  const payout   = parseFloat(document.getElementById('inp-payout').value);
+  const eyebrows = parseFloat(document.getElementById('inp-eyebrow').value)||0;
+
+  if(!payout||payout<1000){
+    if(!silent) showToast('Please enter a valid Monthly Payout (min ₹1000)');
+    return;
+  }
+
+  const {perDay, extra, base} = computeBase(payout);
+  const eyebrowBonus = calcEyebrowBonus(eyebrows);
+  calcData = {payout, perDay, extra, base, eyebrows, eyebrowBonus};
+
+  document.getElementById('res-perday').textContent = fmt(perDay);
+  document.getElementById('res-extra').textContent  = fmt(extra);
+  document.getElementById('res-base').textContent   = fmt(base);
+
+  if(calcMode==='forecast') doForecast(base, eyebrows, eyebrowBonus);
+  else doActual(base, eyebrows, eyebrowBonus, silent);
+
+  document.getElementById('forecast-results').style.display = calcMode==='forecast' ? 'block':'none';
+  document.getElementById('actual-results').style.display   = calcMode==='actual'   ? 'block':'none';
+  document.getElementById('results').classList.add('show');
+  if(!silent) document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── FORECAST ──
+function doForecast(base, eyebrows, eyebrowBonus){
+  selectedMultiple = null;
+  const multiples  = [4,5,6,7,8,9,10];
+  const targets    = multiples.map(m=>{
+    const targetAmt = base * m;
+    const incentive = targetAmt * (m/100); // m% of targetAmt
+    return {multiple:m, targetAmt, pct:m, incentive, total: incentive+eyebrowBonus};
+  });
+  calcData.targets = targets;
+
+  const eyeLabel = eyebrows > 26
+    ? `${eyebrows} eyebrows → ₹10 × ${eyebrows} = ${fmt(eyebrowBonus)}`
+    : eyebrows > 0
+      ? `${eyebrows} eyebrows done · Need ${27-eyebrows} more to unlock bonus`
+      : 'Enter eyebrow count to see bonus';
+  document.getElementById('eyebrow-count-label').textContent = eyeLabel;
+  document.getElementById('res-eyebrow').textContent = fmt(eyebrowBonus);
+
+  document.getElementById('target-table').innerHTML = targets.map(t=>`
+    <div class="target-row" onclick="selectTarget(${t.multiple})" id="tr-${t.multiple}">
+      <div class="target-badge">${t.multiple}x</div>
+      <div class="target-info">
+        <div class="target-amt">Target: ${fmt(t.targetAmt)} · ${t.pct}% incentive</div>
+        <div class="target-earn">${fmt(t.incentive)}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">${t.pct}%</div>
+    </div>
+  `).join('');
+
+  document.getElementById('res-total').textContent     = fmt(eyebrowBonus);
+  document.getElementById('res-breakdown').textContent = 'Select a target above to see total';
+}
+
+function selectTarget(m){
+  if(!calcData||calcMode!=='forecast') return;
+  selectedMultiple = m;
+  const t = calcData.targets.find(x=>x.multiple===m);
+  document.querySelectorAll('.target-row').forEach(r=>r.classList.remove('selected'));
+  document.getElementById('tr-'+m).classList.add('selected');
+  document.getElementById('res-total').textContent     = fmt(t.total);
+  document.getElementById('res-breakdown').textContent =
+    `Incentive ${fmt(t.incentive)} + Eyebrow Bonus ${fmt(calcData.eyebrowBonus)} = ${fmt(t.total)}`;
+}
+
+// ── ACTUAL INCENTIVE ──
+function doActual(base, eyebrows, eyebrowBonus, silent){
+  const saleVal = parseFloat(document.getElementById('inp-sale').value);
+  if(!saleVal||saleVal<1){
+    if(!silent) showToast('Please enter your actual sale amount');
+    document.getElementById('results').classList.remove('show');
+    return;
+  }
+
+  // Find highest COMPLETED multiple (floor). Cap at 10.
+  const rawMultiple  = saleVal / base;
+  const achievedMult = Math.min(Math.floor(rawMultiple), 10);
+
+  const eyeLabel2 = eyebrows > 26
+    ? `${eyebrows} eyebrows → ₹10 × ${eyebrows} = ${fmt(eyebrowBonus)}`
+    : eyebrows > 0 ? `${eyebrows} eyebrows (${27-eyebrows} more needed for bonus)` : '—';
+  document.getElementById('eyebrow-count-label2').textContent = eyeLabel2;
+  document.getElementById('res-eyebrow2').textContent = fmt(eyebrowBonus);
+
+  if(achievedMult < 4){
+    // Below minimum threshold
+    const needed4x = (base * 4) - saleVal;
+    calcData.achievedMult=0; calcData.incentive=0; calcData.actualTotal=eyebrowBonus; calcData.actualSale=saleVal;
+    document.getElementById('actual-tier').textContent =
+      `Sale: ${fmt(saleVal)} · Below 4x target · Need ${fmt(needed4x)} more to reach 4x`;
+    document.getElementById('actual-total').textContent   = fmt(eyebrowBonus);
+    document.getElementById('actual-breakdown').textContent =
+      `Incentive: ₹0 (below 4x)\nEyebrow Bonus: ${fmt(eyebrowBonus)}\n──────────────────\nYour Extra Income: ${fmt(eyebrowBonus)}`;
+    return;
+  }
+
+  // Incentive = actual sale × achieved multiple %
+  const pct       = achievedMult; // 8x → 8%
+  const incentive = saleVal * (pct / 100);
+  const total     = incentive + eyebrowBonus;
+
+  calcData.achievedMult = achievedMult;
+  calcData.incentive    = incentive;
+  calcData.actualTotal  = total;
+  calcData.actualSale   = saleVal;
+
+  const nextMult   = achievedMult < 10 ? achievedMult + 1 : null;
+  const nextTarget = nextMult ? `Next: ${nextMult}x = ${fmt(base * nextMult)}` : '🏆 Maximum 10x reached!';
+
+  document.getElementById('actual-tier').textContent =
+    `Sale ${fmt(saleVal)} × ${pct}% (${achievedMult}x achieved) · ${nextTarget}`;
+  document.getElementById('actual-total').textContent = fmt(total);
+  document.getElementById('actual-breakdown').textContent =
+    `Sale: ${fmt(saleVal)} × ${pct}% = ${fmt(incentive)}\nEyebrow Bonus: ${fmt(eyebrowBonus)}\n──────────────────\nYour Extra Income = ${fmt(total)}`;
+}
+
+// ════════════════════════════════
+// SAVE ENTRY
+// ════════════════════════════════
+function saveEntry(type){
+  if(!calcData){ showToast('Please calculate first!'); return; }
+  let entry = {
+    id:Date.now(), user:currentUser.name, branch:currentUser.branch,
+    date:new Date().toLocaleDateString('en-IN'),
+    month:new Date().toLocaleString('en-IN',{month:'long',year:'numeric'}),
+    payout:calcData.payout, eyebrows:calcData.eyebrows,
+    base:calcData.base, eyebrowBonus:calcData.eyebrowBonus, mode:type
+  };
+  if(type==='forecast'){
+    if(!selectedMultiple){ showToast('Please select a target (4x–10x) first!'); return; }
+    const t = calcData.targets.find(x=>x.multiple===selectedMultiple);
+    entry.multiple=selectedMultiple; entry.targetAmt=t.targetAmt;
+    entry.incentive=t.incentive; entry.total=t.total; entry.actualSale=null;
+  } else {
+    if(calcData.achievedMult===undefined){ showToast('Please calculate first!'); return; }
+    entry.multiple=calcData.achievedMult; entry.actualSale=calcData.actualSale;
+    entry.incentive=calcData.incentive; entry.total=calcData.actualTotal; entry.targetAmt=null;
+  }
+  const entries = getAllEntries();
+  entries.unshift(entry);
+  saveAllEntries(entries);
+  showToast('✅ Entry saved!');
+  updateProfileStats();
+}
+
+// ════════════════════════════════
+// HISTORY
+// ════════════════════════════════
+function renderHistory(){
+  const entries = getUserEntries(currentUser.name);
+  const list = document.getElementById('history-list');
+  if(!entries.length){
+    list.innerHTML=`<div class="history-empty"><div style="font-size:48px">📋</div>
+      <div>No entries yet · अभी कोई एंट्री नहीं</div>
+      <div style="margin-top:8px;font-size:13px">Calculate and save your incentive!</div></div>`;
+    return;
+  }
+  const byMonth={};
+  entries.forEach(e=>{ if(!byMonth[e.month]) byMonth[e.month]=[]; byMonth[e.month].push(e); });
+  list.innerHTML = Object.entries(byMonth).map(([month,items])=>`
+    <div class="month-group">
+      <div class="month-label">📅 ${month}</div>
+      ${items.map(e=>`
+        <div class="history-card">
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">
+              ${e.date} · ${e.mode==='actual'
+                ? '<span style="color:var(--green)">✓ Actual</span>'
+                : '<span style="color:var(--gold)">◎ Forecast</span>'}
+            </div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Monthly Payout: ${fmt(e.payout)}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;line-height:1.6">
+              Base: ${fmt(e.base)} · ${e.multiple}x ${e.mode==='actual'?'achieved':'target'}<br/>
+              ${e.actualSale?'Sale: '+fmt(e.actualSale)+' · ':''}Eyebrows: ${e.eyebrows}
+              ${e.eyebrowBonus>0?' (Bonus: '+fmt(e.eyebrowBonus)+')':''}
+            </div>
+          </div>
+          <div class="hist-right">
+            <div class="hist-total">${fmt(e.total)}</div>
+            <div style="font-size:11px;color:var(--text3)">${e.multiple}x</div>
+          </div>
+          <button class="hist-delete" onclick="deleteEntry(${e.id})" title="Delete">🗑</button>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function deleteEntry(id){
+  if(!confirm('Delete this entry?')) return;
+  saveAllEntries(getAllEntries().filter(e=>e.id!==id));
+  renderHistory();
+  showToast('Entry deleted');
+}
+
+// ════════════════════════════════
+// ADMIN DASHBOARD
+// ════════════════════════════════
+function renderAdmin(){
+  const el = document.getElementById('admin-content');
+  if(!isAdmin){
+    el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text3)"><div style="font-size:48px">🔒</div><br>Admin only area</div>';
+    return;
+  }
+  const all    = getAllEntries();
+  const users  = getUsers();
+  const months = [...new Set(all.map(e=>e.month))].sort().reverse();
+
+  const bspMap={};
+  all.forEach(e=>{
+    if(!bspMap[e.user]) bspMap[e.user]={name:e.user,branch:e.branch,entries:[],totalEarn:0};
+    bspMap[e.user].entries.push(e);
+    bspMap[e.user].totalEarn+=e.total;
+  });
+  const bspArr = Object.values(bspMap).sort((a,b)=>b.totalEarn-a.totalEarn);
+
+  const totalBSP=Object.keys(users).length;
+  const totalInc=all.reduce((s,e)=>s+e.total,0);
+  const avg=all.length?totalInc/all.length:0;
+
+  el.innerHTML=`
+    <div class="section-title" style="margin-top:0">📊 Overview · ओवरव्यू</div>
+    <div class="admin-stats fade-up">
+      <div class="stat-card"><div class="stat-label">Beauty Providers</div><div class="stat-val">${totalBSP}</div><div class="stat-sub">Registered</div></div>
+      <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-val">${all.length}</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card"><div class="stat-label">Total Incentives</div><div class="stat-val">${fmt(totalInc)}</div><div class="stat-sub">Combined</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Per Entry</div><div class="stat-val">${fmt(avg)}</div><div class="stat-sub">Average</div></div>
+    </div>
+
+    <div class="section-title">🏆 Leaderboard · लीडरबोर्ड</div>
+    ${bspArr.length===0?'<div style="color:var(--text3);padding:16px">No entries yet.</div>':
+      bspArr.slice(0,10).map((s,i)=>{
+        const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        const medals=['🥇','🥈','🥉'];
+        return `<div class="lb-card fade-up">
+          <div class="lb-rank ${rc}">${medals[i]||i+1}</div>
+          <div class="lb-info">
+            <div class="lb-name">${s.name}</div>
+            <div class="lb-meta">${s.branch} · ${s.entries.length} entries</div>
+          </div>
+          <div class="lb-earn">${fmt(s.totalEarn)}<small>total</small></div>
+        </div>`;
+      }).join('')
+    }
+
+    <div class="section-title">👥 All Entries · सभी एंट्री</div>
+    <div class="admin-filter">
+      <button class="filter-chip active" onclick="filterAdmin('all',this)">All Months</button>
+      ${months.map(m=>`<button class="filter-chip" onclick="filterAdmin('${m}',this)">${m}</button>`).join('')}
+    </div>
+    <div id="admin-entries">${renderBSPEntries(all)}</div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">🔐 Password Settings · पासवर्ड सेटिंग्स</div>
+
+    <div class="settings-card">
+      <div class="settings-title">💄 Team Password (Beauty Service Providers)</div>
+      <div class="settings-sub">
+        यह पासवर्ड WhatsApp पर सभी Beauty Service Providers को भेजें।<br/>
+        <strong>जब भी पासवर्ड बदलोगे — पुराने पासवर्ड से कोई login नहीं कर पाएगा।</strong><br/><br/>
+        Current Team Password:
+      </div>
+      <div class="current-pass-badge" id="show-team-pass">${getTeamPass()}</div>
+      <input class="inp" id="new-team-pass" placeholder="Type new team password" style="margin-bottom:10px"/>
+      <button class="btn-warning" onclick="changeTeamPass()">🔄 Update Team Password</button>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-title">👑 Admin Password</div>
+      <div class="settings-sub">Change your personal admin login password. Minimum 6 characters.</div>
+      <input class="inp" id="new-admin-pass" type="password" placeholder="New admin password" style="margin-bottom:8px"/>
+      <input class="inp" id="confirm-admin-pass" type="password" placeholder="Confirm new password" style="margin-bottom:10px"/>
+      <button class="btn-warning" onclick="changeAdminPass()">🔐 Update Admin Password</button>
+    </div>
+  `;
+}
+
+function renderBSPEntries(entries){
+  if(!entries.length) return '<div style="color:var(--text3);padding:16px;text-align:center">No entries found.</div>';
+  return entries.map(e=>`
+    <div class="bsp-entry fade-up">
+      <div class="bsp-header">
+        <div>
+          <div class="bsp-name">${e.user}</div>
+          <div class="bsp-date">${e.branch||''} · ${e.date} · ${e.month}</div>
+        </div>
+        <span class="badge ${e.mode==='actual'?'badge-green':'badge-gold'}">${e.multiple}x ${e.mode==='actual'?'✓ Actual':'◎ Forecast'}</span>
+      </div>
+      <div class="bsp-metrics">
+        <div class="metric"><div class="metric-label">Monthly Payout</div><div class="metric-val">${fmt(e.payout)}</div></div>
+        <div class="metric"><div class="metric-label">Base</div><div class="metric-val">${fmt(e.base)}</div></div>
+        <div class="metric"><div class="metric-label">Incentive</div><div class="metric-val">${fmt(e.incentive)}</div></div>
+        <div class="metric"><div class="metric-label">Eyebrows</div><div class="metric-val">${e.eyebrows}</div></div>
+        <div class="metric"><div class="metric-label">Eyebrow Bonus</div><div class="metric-val">${fmt(e.eyebrowBonus)}</div></div>
+        <div class="metric"><div class="metric-label">Extra Income</div><div class="metric-val gold">${fmt(e.total)}</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterAdmin(month, btn){
+  document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const all = getAllEntries();
+  document.getElementById('admin-entries').innerHTML = renderBSPEntries(
+    month==='all' ? all : all.filter(e=>e.month===month)
+  );
+}
+
+// ════════════════════════════════
+// PASSWORD CHANGE
+// ════════════════════════════════
+function changeTeamPass(){
+  const np = document.getElementById('new-team-pass').value.trim();
+  if(!np||np.length<4){ showToast('Password must be at least 4 characters'); return; }
+  setTeamPass(np);
+  document.getElementById('show-team-pass').textContent = np;
+  document.getElementById('new-team-pass').value = '';
+  showToast('✅ Team password updated! Share it via WhatsApp with all Beauty Providers.');
+}
+
+function changeAdminPass(){
+  const np  = document.getElementById('new-admin-pass').value.trim();
+  const cnf = document.getElementById('confirm-admin-pass').value.trim();
+  if(!np||np.length<6){ showToast('Admin password must be at least 6 characters'); return; }
+  if(np!==cnf){ showToast('❌ Passwords do not match'); return; }
+  setAdminPass(np);
+  document.getElementById('new-admin-pass').value='';
+  document.getElementById('confirm-admin-pass').value='';
+  showToast('✅ Admin password updated!');
+}
+
+// ════════════════════════════════
+// PROFILE
+// ════════════════════════════════
+function updateProfileStats(){
+  if(!currentUser) return;
+  const entries  = getUserEntries(currentUser.name);
+  const best     = entries.reduce((m,e)=>Math.max(m,e.total),0);
+  const eyebrows = entries.reduce((s,e)=>s+(e.eyebrows||0),0);
+  document.getElementById('prof-entries').textContent  = entries.length;
+  document.getElementById('prof-best').textContent     = fmt(best);
+  document.getElementById('prof-eyebrows').textContent = eyebrows;
+}
+
+function clearMyData(){
+  if(!confirm('Delete all your saved entries?')) return;
+  saveAllEntries(getAllEntries().filter(e=>e.user!==currentUser.name));
+  updateProfileStats();
+  showToast('All your entries cleared.');
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ════════════════════════════════
+// PWA
+// ════════════════════════════════
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  setTimeout(()=>{ if(deferredPrompt) showToast('💡 Add to Home Screen: Tap Share → Add to Home Screen'); },7000);
+});
+</script>
+
+<script>
+(function(){
+  const m={name:"CV Salon — Incentive Calculator",short_name:"CV Salon",
+    start_url:"./",display:"standalone",background_color:"#0f0c07",theme_color:"#1a1108",
+    orientation:"portrait",
+    icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231c1710'/><text y='.9em' font-size='70' x='10'>💄</text></svg>",sizes:"512x512",type:"image/svg+xml"}]};
+  const link=document.createElement('link');
+  link.rel='manifest';
+  link.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));
+  document.head.appendChild(link);
+})();
+</script>
+</body>
+</html>
